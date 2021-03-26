@@ -5,7 +5,7 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectId=require('mongodb').ObjectId;
 const {dbPass} from './config.js';
 console.log(dbPass);
-const uri = "mongodb+srv://organicUser:xih2HrraMu3Pi.q@cluster0.kdxcg.mongodb.net/tasks?retryWrites=true&w=majority";
+const uri = "mongodb+srv://<User>:<Password>@cluster0.kdxcg.mongodb.net/<dbname>?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(bodyParser.json())
