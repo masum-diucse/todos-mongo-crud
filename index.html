@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+</head>
+<body>
+    <h1>Todo App</h1>
+    <!-- post todo task -->
+    <form action="/addTodo" method="POST">
+        <input type="text" placeholder="title" name="title">
+        <input type="text" placeholder="description" name="description">
+        <button type="submit">Add Todo</button>
+    </form>
+    <hr>
+    <!-- get todo list -->
+    <div id="todos"></div>
+    <div id="update-todo"></div>
+
+    <script>
+        //--get todo list
+        const getAllTodos=()=>{
+            fetch('getAllTodos')
+            .then(res=>res.json())
+            .then(data=>{
+                const container=document.getElementById('todos');
+                container.innerHTML="";
+                data.forEach(td=>{
+                    const item=document.createElement('p');
+                    item.innerHTML=`
+                    <strong>Title:</strong> ${td.title} <strong>Description:</strong> ${td.description}
+                    <button onclick="loadTodo('${td._id}')">Update</button>
+                    <button onclick="deleteTodo(event,'${td._id}')">Delete</button>
+                    `;
+                    container.appendChild(item);
+                })
+            })
+        }
+
+        const loadTodo=(id)=>{
+            fetch(`/getTodo/${id}`)
+            .then(res=>res.json())
+            .then(data=>{
+                const updateTodo=document.getElementById('update-todo');
+                updateTodo.innerHTML=`
+                <h3>Update Todo</h3>
+                Title: <input type="text" value='${data.title}' id="title">
+                Description: <input type="text" value='${data.description}' id="description">
+                <button onclick="updateTodo(event,'${data._id}')">Submit</button>
+                `
+            })
+        }
+
+        const updateTodo=(event,id)=>{
+            const title=document.getElementById('title').value;
+            const description=document.getElementById('description').value;
+            const todo={title,description};
+            fetch(`/update/${id}`,{
+                method:"PATCH",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(todo)
+            })
+            .then(res=>res.json())
+            .then(result=>{
+                if(result){
+                    getAllTodos();
+                    document.getElementById('update-todo').innerHTML="";
+                }
+            })
+        }
+        const deleteTodo=(event,id)=>{
+            fetch(`/delete/${id}`,{
+                method:'DELETE'
+            })
+            .then(res=>res.json())
+            .then(result=>{
+              if(result){event.target.parentNode.style.display="none";}
+            })
+        }
+
+        getAllTodos();
+    </script>
+</body>
+</html>
